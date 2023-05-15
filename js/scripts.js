@@ -1,27 +1,36 @@
 'use strict';
 
-const getData = () => {
-    
-    fetch('http://api.nbp.pl/api/exchangerates/tables/a/?format=json')
-    .then(reponse => reponse.json())
-    .then(result =>{
+const baseURL = 'http://api.nbp.pl/api/exchangerates/tables/'
 
-        console.log(result);
+const getCurrency = async (table) => {
 
-        console.log(result[0].rates);
-        result[0].rates.forEach((elem, i) => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = 
-            `<td>${++i}</td>
-             <td>${elem.currency}</td>
-             <td>${elem.mid}</td>
-            `
-            document.querySelector('table tbody').appendChild(tr);
-        })
-        
-    });
+        try {
+            const responce = await fetch(`${baseURL}${table}`)
+            const data = await responce.json();
+            return data;
+        } catch(err) {
+            console.log(`To jest błąd: ${err}`);
+        }
 }
 
-const btn = document.querySelector('button');
+getCurrency("a").then((data) => {
 
-btn.addEventListener('click', getData)
+    console.log('data');
+
+    const [currencies] = data;
+
+    const {rates} = currencies;
+
+    rates.forEach((elem, i) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = 
+        `<td>${++i}</td>
+         <td>${elem.currency}</td>
+         <td>${elem.mid}</td>
+        `
+        document.querySelector('table tbody').appendChild(tr);
+    });
+});
+
+
+const btn = document.querySelector('button');
